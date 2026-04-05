@@ -8,6 +8,15 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { execSync } from "node:child_process";
+import { homedir } from "node:os";
+
+function readLayoutConfig() {
+  try {
+    return JSON.parse(readFileSync(join(homedir(), ".jware", "layout.json"), "utf8"));
+  } catch {
+    return {};
+  }
+}
 
 function findJwareRoot(startDir) {
   let dir = startDir;
@@ -93,13 +102,17 @@ try {
 }
 
 // Spawn tree view pane if not already present
+// Layout config: treeDirection ("h" or "v"), treeSize (columns/rows)
 if (!paneExists) {
+  const layout = readLayoutConfig();
+  const dir = layout.treeDirection || "v";
+  const size = layout.treeSize || 15;
   try {
-    execSync(`tmux split-window -v -l 15 "watch -n 1 cat '${treePath}'"`, { timeout: 5000 });
+    execSync(`tmux split-window -${dir} -l ${size} "watch -n 1 cat '${treePath}'"`, { timeout: 5000 });
   } catch {
     // fallback without watch
     try {
-      execSync(`tmux split-window -v -l 15 "while true; do clear; cat '${treePath}' 2>/dev/null; sleep 1; done"`, { timeout: 5000 });
+      execSync(`tmux split-window -${dir} -l ${size} "while true; do clear; cat '${treePath}' 2>/dev/null; sleep 1; done"`, { timeout: 5000 });
     } catch {
       // give up on pane creation
     }
