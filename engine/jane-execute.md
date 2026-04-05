@@ -65,7 +65,24 @@ bash $JWARE_HOME/scripts/jware-tree-update.sh "$(pwd)" "{cycleNumber}" '{json-da
 
 ### 4. Monitor and Coordinate
 
-Listen for team messages via SendMessage. Teams will request:
+> **Teams are spawned in tmux panes, NOT via the Agent tool.** You will NOT receive automatic notifications when they complete. You MUST actively poll for completion.
+
+**Primary monitoring loop — poll every 30 seconds:**
+```bash
+# Check which teams are still running (tmux panes with claude)
+tmux list-panes -F "#{pane_id} #{pane_current_command}"
+
+# Check for team completion status files
+cat .jware/team-alpha-status.json 2>/dev/null
+cat .jware/team-bravo-status.json 2>/dev/null
+cat .jware/team-charlie-status.json 2>/dev/null
+```
+
+A team is done when:
+1. Its `.jware/team-{name}-status.json` file exists with `"status": "complete"` or `"status": "failed"`, OR
+2. Its tmux pane shows `zsh`/`bash` instead of `claude` (crashed — treat as failed)
+
+**While waiting, also handle SendMessage requests from teams:**
 
 **Role agent requests:**
 1. For dev/edit agents: check file locks first
@@ -87,7 +104,7 @@ Listen for team messages via SendMessage. Teams will request:
 When Team A needs info from Team B: A asks you → you ask B via SendMessage → B responds → you relay to A. Teams never message each other directly.
 
 **Completion reports:**
-When a team reports a task done, update tree view.
+When a team reports a task done (via status file or SendMessage), update tree view.
 
 **Blockers:**
 - Circular blocks (A waits on B waits on A): break with partial deliverable or escalate
@@ -106,15 +123,16 @@ bash $JWARE_HOME/scripts/jware-file-lock.sh release-all-for-task "$(pwd)" "" "" 
 
 ### 6. Completion
 
-When all teams report complete:
-1. Shut down teams: SendMessage shutdown_request to each team
+When all teams have completed (all status files show `"complete"` or `"failed"`):
+1. Read each team's status file to collect results
 2. Kill tmux panes:
    ```bash
    tmux kill-pane -t {pane-id}
    ```
-3. Clean up temp files:
+3. Clean up temp and status files:
    ```bash
    rm -f /tmp/team-*-prompt.md
+   rm -f .jware/team-*-status.json
    ```
 
 ### 7. Save Results

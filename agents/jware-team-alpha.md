@@ -66,4 +66,25 @@ When requesting role agents from the orchestrator, always specify:
 - What needs to be done
 - **For dev agents: which files the task will touch** (required for file locking). The orchestrator will check for conflicts before dispatching. If files are locked by another team, you'll be told to work on a different task or wait.
 
-When done, save your full context to `.jware/agent-context/team-alpha-{timestamp}.md`.
+## Completion Signaling
+
+When ALL your assigned tasks are done (or failed), you MUST write a status file so the orchestrator can detect completion:
+
+```bash
+cat > .jware/team-alpha-status.json << 'EOF'
+{
+  "team": "alpha",
+  "status": "complete",
+  "completedAt": "ISO 8601 timestamp",
+  "tasks": {
+    "completed": ["#id1", "#id2"],
+    "failed": ["#id3"]
+  },
+  "summary": "Brief summary of what was done"
+}
+EOF
+```
+
+Also save your full context to `.jware/agent-context/team-alpha-{timestamp}.md`.
+
+**This file is how the orchestrator knows you are done.** If you don't write it, the orchestrator will assume you are still running.

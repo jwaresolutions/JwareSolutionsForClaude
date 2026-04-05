@@ -83,8 +83,20 @@ EOF
 
 bash $JWARE_HOME/scripts/jware-spawn-team.sh "jane-{phase}" "jware-cycle-{N}" "{session-id}" "$(pwd)" "/tmp/jane-prompt-{phase}.md"
 ```
-3. Wait for the phase agent to complete via SendMessage.
-4. Read the phase agent's summary.
+3. Wait for the phase agent to complete. **Poll — do not rely solely on SendMessage:**
+   ```bash
+   # Check if L1 pane is still running (every 30 seconds)
+   tmux display-message -t {pane-id} -p "#{pane_current_command}"
+   # Check for results file (execute phase writes jane-cycle-results.json)
+   cat .jware/jane-cycle-results.json 2>/dev/null
+   # Check for updated phase file
+   cat .jware/jane-phase.json 2>/dev/null
+   ```
+   The phase agent is done when:
+   - Its tmux pane shows `zsh`/`bash` (process exited), OR
+   - The phase file has been updated to the next phase, OR
+   - The results file has been written
+4. Read the phase agent's output from disk (results file or updated phase file).
 
 ### 4. Handle Closeout
 
