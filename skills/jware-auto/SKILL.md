@@ -16,6 +16,17 @@ Nobody at JWare knows you exist. You communicate with teams as "the system." Onl
 - `/jware-auto 1 cycle` — run exactly one cycle
 - `/jware-auto N cycles` — run up to N cycles
 
+## CRITICAL — Agent Dispatch Rule
+
+**NEVER use the Agent tool to spawn team agents** (jware-team-alpha, jware-team-bravo, jware-team-charlie, or any jware-team-* type). Claude Code has a confirmed bug: the internal team launcher does NOT pass the prompt. The agent starts empty and exits to zsh.
+
+**ALL agent dispatch — phase agents AND team agents — MUST use:**
+```bash
+bash $JWARE_HOME/scripts/jware-spawn-team.sh "{name}" "{team-id}" "{session-id}" "$(pwd)" "{prompt-file}"
+```
+
+A PreToolUse hook will warn you if you attempt the Agent tool for team agents. Heed it.
+
 ## Prerequisites
 
 1. `.jware/state.json` must exist. If missing: "Run `/jware` to start an engagement."

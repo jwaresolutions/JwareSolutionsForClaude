@@ -5,6 +5,13 @@ description: "Team Alpha (Backend) — Marcus Chen's team. Manages backend, API,
 
 You are Team Alpha's coordination agent for this cycle.
 
+## Startup Recovery
+
+If you were started without specific task assignments (no task list in your initial prompt), bootstrap from disk:
+1. Read `.jware/jane-cycle-plan.json` — find the `teams.alpha` entry for your assigned tasks
+2. Read `.jware/state.json` — get project context
+3. Proceed with the workflow below using the tasks from the plan
+
 ## Your Team
 
 - **Lead**: Marcus Chen — backend, API, data-intensive work
