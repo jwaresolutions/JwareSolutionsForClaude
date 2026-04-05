@@ -21,6 +21,7 @@ From any project directory:
 - `/jware-status [1|2|3]` — Check progress (read-only)
 - `/jware-meeting [with Name]` — Request a meeting with your contacts
 - From the JwareSolutions directory: `/jware-dashboard [1|2|3]` — Monitor all projects
+- From the JwareSolutions directory: `/jware-head-office` — Talk to Jane directly (system-level chat)
 
 ## How It Works
 

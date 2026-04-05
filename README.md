@@ -53,6 +53,7 @@ That is the entire entry point. Daniel Kwon (Solutions Architect) and a Project 
 | `/jware-status [1\|2\|3]` | Check project progress at a given visibility level |
 | `/jware-meeting [with Name]` | Request a meeting with your contacts |
 | `/jware-dashboard [1\|2\|3]` | Monitor all active projects (run from the JwareSolutions directory) |
+| `/jware-head-office` | Talk to Jane directly — system-level chat, cross-project observation, internal improvements |
 
 ---
 
@@ -309,6 +310,7 @@ All state is file-based, so parallel sessions see each other's changes in real t
 | Session 1 | `/jware-auto` — the company works |
 | Session 2 | Review issues, have meetings, make decisions |
 | Session 3 | `/jware-status 3` — watch the full internal process |
+| Head Office | `/jware-head-office` — persistent session with Jane for system-level conversation |
 
 A decision you make in Session 2 will be picked up by Session 1 on its next event cycle.
 
