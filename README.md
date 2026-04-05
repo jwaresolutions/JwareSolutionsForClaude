@@ -31,7 +31,7 @@ The company handles greenfield and brownfield projects. Multiple concurrent proj
 /plugin install jware-solutions
 ```
 
-That's it. Skills, agents, hooks, and scripts are registered automatically. `JWARE_HOME` is set to the plugin install directory — no manual configuration needed.
+When prompted for scope, select **"Install for you (user scope)"** — this makes JWare available from any project directory on your machine. Skills, agents, hooks, and scripts are registered automatically. `JWARE_HOME` is set to the plugin install directory — no manual configuration needed.
 
 ### Start a Project
 
