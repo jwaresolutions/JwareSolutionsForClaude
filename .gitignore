@@ -1,0 +1,24 @@
+# Runtime state (generated per-project, not part of the system definition)
+.jware/
+
+# Specs contain details about past projects and internal design decisions
+docs/specs/
+
+# Claude Code local config (agents are at root /agents/ per plugin spec)
+.claude/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Environment files
+.env
+.env.*
+*.local.json
+
+# Temp files
+/tmp/
+*.tmp

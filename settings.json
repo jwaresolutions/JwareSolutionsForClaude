@@ -1,0 +1,5 @@
+{
+  "env": {
+    "JWARE_HOME": "${CLAUDE_PLUGIN_ROOT}"
+  }
+}

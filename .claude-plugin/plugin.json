@@ -1,0 +1,21 @@
+{
+  "name": "jware-solutions",
+  "version": "1.0.0",
+  "description": "48-person event-driven virtual software company that builds bespoke software applications",
+  "author": {
+    "name": "Justin Malone"
+  },
+  "repository": "https://github.com/justinmalone/JwareSolutions",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "virtual-company",
+    "software-development",
+    "multi-agent",
+    "orchestration"
+  ],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
+}

@@ -1,0 +1,37 @@
+{
+  "_template": "project-state v1.0 — copy to .jware/state.json in project root during intake",
+  "projectId": "proj_NNN",
+  "projectName": "",
+  "projectPath": "",
+  "phase": "intake",
+  "visibility": 2,
+  "greenfield": true,
+  "teams": {
+    "primary": {
+      "lead": "",
+      "seniors": [],
+      "mids": [],
+      "juniors": [],
+      "qa": ""
+    },
+    "secondary": null,
+    "tertiary": null
+  },
+  "tradingDivision": {
+    "active": false,
+    "members": []
+  },
+  "pm": "",
+  "solutionsArchitect": "daniel-kwon",
+  "startedAt": "",
+  "lastActivity": "",
+  "currentCycle": 0,
+  "totalTasks": 0,
+  "completedTasks": 0,
+  "inProgressTasks": 0,
+  "blockedTasks": 0,
+  "decisionsNeeded": 0,
+  "branchingStrategy": "",
+  "techStack": [],
+  "risks": 0
+}

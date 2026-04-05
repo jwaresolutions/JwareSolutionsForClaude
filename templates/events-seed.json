@@ -1,0 +1,73 @@
+[
+  {
+    "_comment": "Seed event 1: project kickoff — fired immediately after intake completes",
+    "id": "evt_20260325000000_seed1",
+    "type": "project:kickoff",
+    "source": "system",
+    "target": null,
+    "projectId": "proj_NNN",
+    "payload": {
+      "phase": "kickoff",
+      "teams": [],
+      "pm": "",
+      "issueCount": 0,
+      "greenfield": true
+    },
+    "priority": "HIGH",
+    "timestamp": "",
+    "processed": false,
+    "processedAt": null,
+    "processedBy": null,
+    "generatedEvents": [],
+    "parentEventId": null,
+    "depth": 0
+  },
+  {
+    "_comment": "Seed event 2: dev environment setup — dev lead spins up repo, CI, and tooling",
+    "id": "evt_20260325000001_seed2",
+    "type": "task:assigned",
+    "source": "daniel-kwon",
+    "target": "",
+    "projectId": "proj_NNN",
+    "payload": {
+      "issueId": "",
+      "title": "Set up development environment and project scaffolding",
+      "priority": "HIGH",
+      "estimatedHours": 4,
+      "labels": ["setup", "infrastructure"],
+      "description": "Initialize repo, configure CI/CD pipeline, set up linting and formatting, create initial project structure per agreed tech stack."
+    },
+    "priority": "HIGH",
+    "timestamp": "",
+    "processed": false,
+    "processedAt": null,
+    "processedBy": null,
+    "generatedEvents": [],
+    "parentEventId": "evt_20260325000000_seed1",
+    "depth": 1
+  },
+  {
+    "_comment": "Seed event 3: first sprint planning — PM creates initial backlog from intake notes",
+    "id": "evt_20260325000002_seed3",
+    "type": "sprint:planned",
+    "source": "",
+    "target": null,
+    "projectId": "proj_NNN",
+    "payload": {
+      "sprintNumber": 1,
+      "goals": [],
+      "issueIds": [],
+      "plannedHours": 0,
+      "startDate": "",
+      "endDate": ""
+    },
+    "priority": "NORMAL",
+    "timestamp": "",
+    "processed": false,
+    "processedAt": null,
+    "processedBy": null,
+    "generatedEvents": [],
+    "parentEventId": "evt_20260325000000_seed1",
+    "depth": 1
+  }
+]
