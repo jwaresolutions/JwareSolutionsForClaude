@@ -18,9 +18,16 @@ if [ ! -f "$PROMPT_FILE" ]; then
   exit 1
 fi
 
-PROMPT=$(cat "$PROMPT_FILE")
+# Spawn the team agent in a new tmux pane.
+# The prompt file is read inside the pane via $(cat ...) to avoid quoting issues
+# with complex multi-line prompts containing quotes or special characters.
+PANE_ID=$(tmux split-window -h -P -F "#{pane_id}" "cd '${PROJECT_DIR}' && claude --agent-id '${TEAM_NAME}@${TEAM_ID}' --agent-name '${TEAM_NAME}' --team-name '${TEAM_ID}' --parent-session-id '${SESSION_ID}' --dangerously-skip-permissions --model claude-sonnet-4-6 \"\$(cat '${PROMPT_FILE}')\"")
 
-# Spawn the team agent in a new tmux pane
-PANE_ID=$(tmux split-window -h -P -F "#{pane_id}" "cd '$PROJECT_DIR' && claude --agent-id '${TEAM_NAME}@${TEAM_ID}' --agent-name '$TEAM_NAME' --team-name '$TEAM_ID' --parent-session-id '$SESSION_ID' --dangerously-skip-permissions --model claude-sonnet-4-6 \"$PROMPT\"")
+# Verify the agent started (give it a moment to initialize)
+sleep 2
+PANE_CMD=$(tmux display-message -t "$PANE_ID" -p "#{pane_current_command}" 2>/dev/null)
+if [ "$PANE_CMD" = "zsh" ] || [ "$PANE_CMD" = "bash" ]; then
+  echo "WARNING: Agent in pane $PANE_ID may have failed to start (showing $PANE_CMD)"
+fi
 
 echo "SPAWNED: team=$TEAM_NAME pane=$PANE_ID"

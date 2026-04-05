@@ -26,18 +26,22 @@ TeamCreate("jware-cycle-{cycleNumber}")
 
 ### 2. Spawn Team Agents
 
-**DO NOT use the Agent tool for team agents.** Teams MUST be spawned via tmux.
+> **CRITICAL BUG — READ THIS BEFORE DISPATCHING**
+>
+> Claude Code's internal team agent launcher (the Agent tool with `team_name`) does NOT pass the prompt to the child process. The agent starts with no instructions and exits immediately to a zsh prompt. This bug is confirmed and documented.
+>
+> **You MUST use the bash spawn script below. The Agent tool WILL fail silently.**
 
-For each active team in the cycle plan:
+**For each active team in the cycle plan:**
 
-**Step A:** Write team prompt to temp file:
+**Step A:** Write the team prompt to a temp file. Include the full task list, blockers, project context, and agent instructions:
 ```bash
 cat > /tmp/team-{teamName}-prompt.md << 'TEAM_EOF'
 {Team's full prompt: task list, blockers, project context, agent instructions}
 TEAM_EOF
 ```
 
-**Step B:** Spawn via script:
+**Step B:** Spawn via the bash script (NOT the Agent tool):
 ```bash
 bash $JWARE_HOME/scripts/jware-spawn-team.sh "{teamName}" "jware-cycle-{N}" "{session-id}" "$(pwd)" "/tmp/team-{teamName}-prompt.md"
 ```
@@ -45,6 +49,12 @@ bash $JWARE_HOME/scripts/jware-spawn-team.sh "{teamName}" "jware-cycle-{N}" "{se
 Save the pane ID from output `SPAWNED: team={name} pane={id}` to `.jware/jane-panes.json`.
 
 **Step C:** Repeat for each active team.
+
+**Step D:** After all teams are spawned, verify they are running:
+```bash
+tmux list-panes -a -F "#{pane_id} #{pane_current_command}" | grep claude
+```
+If any pane shows `zsh` instead of `claude`, the spawn failed — re-read the prompt file and retry that team.
 
 ### 3. Update Tree View
 
