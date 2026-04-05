@@ -27,7 +27,7 @@ The company handles greenfield and brownfield projects. Multiple concurrent proj
 ### Setup
 
 ```bash
-/plugin marketplace add https://github.com/justinmalone/JwareSolutions
+/plugin marketplace add https://github.com/jwaresolutions/JwareSolutionsForClaude
 /plugin install jware-solutions
 ```
 
