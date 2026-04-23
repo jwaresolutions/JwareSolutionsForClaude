@@ -91,12 +91,43 @@ A team is done when:
    bash $JWARE_HOME/scripts/jware-file-lock.sh acquire "$(pwd)" "{file}" "{team}" "{task-id}"
    ```
 2. If locked by another team: tell requesting team which files are locked and by whom
-3. If available: lock files, then dispatch role agent:
+3. If available: lock files, then compose and dispatch role agent:
+
+   **3a. Compose the full prompt** from three layers:
+   - Personality injection (via personality-loader for the requested slug + agent type)
+   - Role prompt (from `$JWARE_HOME/agents/{agent-type}.md`)
+   - Task details (issue acceptance criteria, files to read, relevant context, constraints)
+
+   **3b. Persist the composed prompt (if task prompt capture is active):**
+   ```bash
+   # Check if task prompt capture is enabled for this project
+   if [[ -f ".jware/capture-task-prompts.json" ]]; then
+     mkdir -p .jware/agent-context/dispatches
+     cat > ".jware/agent-context/dispatches/task-{task-id}-{role}-{slug}.md" << 'DISPATCH_EOF'
+     # Full composed prompt as sent to the agent
+     {composed prompt}
+     DISPATCH_EOF
+   fi
+   ```
+
+   The capture file `.jware/capture-task-prompts.json` controls whether prompt persistence is active:
+   ```json
+   {
+     "enabled": true,
+     "scope": "Phases 2-9 only",
+     "reason": "Customer audit of task prompt quality — review after Phase 9",
+     "createdAt": "ISO 8601"
+   }
+   ```
+
+   When capture is enabled, every role agent dispatch writes the full composed prompt to disk BEFORE dispatching the agent. This gives the customer visibility into exactly what instructions each developer received.
+
+   **3c. Dispatch the role agent:**
    ```
    Agent tool:
      subagent_type: "{jware-dev|jware-dev-senior|jware-reviewer|jware-qa|jware-verifier}"
      model: "{haiku|sonnet|opus}"
-     prompt: [Personality from $JWARE_HOME/personalities/] + [Task] + [Context]
+     prompt: [The composed prompt from 3a]
    ```
 4. Send results back to requesting team via SendMessage
 
@@ -121,9 +152,56 @@ After JARVIS passes on a task, release its file locks:
 bash $JWARE_HOME/scripts/jware-file-lock.sh release-all-for-task "$(pwd)" "" "" "{task-id}"
 ```
 
-### 6. Completion
+### 6. Push to Remote
 
-When all teams have completed (all status files show `"complete"` or `"failed"`):
+When all teams have completed and all tasks have passed their gates:
+
+1. Push all commits to main:
+   ```bash
+   git push origin main
+   ```
+   All work is done on main — no feature branches. This is a hard rule.
+
+2. If push fails (conflict, hook failure, etc.): diagnose and resolve. Do not force-push without customer approval.
+
+3. After successful push: notify the customer that code is pushed and ready for deployment. The customer triggers the deployment — JWare does NOT trigger CI/CD pipelines or GitHub Actions.
+
+### 6a. Deployment Verification
+
+After pushing to main, the push triggers GitHub Actions automatically. JWare monitors the result.
+
+1. **Monitor the GitHub Actions run:**
+   ```bash
+   gh run list --limit 1 --branch main
+   gh run view {run-id}
+   ```
+   Wait for the alpha deployment workflow to complete. Check status with `gh run view`.
+
+2. **If GitHub Actions succeeds**, verify the deployment is healthy:
+   - Hit the health endpoint if one exists
+   - SSH to the server if access is configured (check `.jware/state.json` or project memory for server access details)
+   - Check container status: `docker ps`, `docker logs {container} --tail 50`
+   - Verify migrations ran if the cycle included schema changes
+   - For frontend changes: verify deployed routes load correctly
+
+3. **If GitHub Actions fails:**
+   - Read the workflow logs: `gh run view {run-id} --log-failed`
+   - Diagnose the failure (build error, test failure, deployment step failure, secret/config issue)
+   - If fixable (code issue, missing env var, test flake): fix it, commit, push, monitor the new run
+   - If not fixable (infrastructure, permissions, GitHub-side issue): report findings to customer with diagnosis and logs
+
+4. **If deployment succeeds but the app is unhealthy:**
+   - SSH to the server to check container state and logs
+   - Check for migration failures, port conflicts, dependency issues
+   - Fix if possible, otherwise report with diagnosis
+
+5. If everything is healthy: record in cycle results and proceed to the next phase.
+
+**Important:** JWare does NOT manually trigger GitHub Actions workflows (no `gh workflow run`, no re-run buttons). The push to main triggers the pipeline automatically. JWare monitors the run, reads logs, and troubleshoots failures. Direct server commands (SSH, docker logs, checking health endpoints) are fine. The boundary is: the push triggers the pipeline, JWare monitors and verifies the result.
+
+### 7. Cleanup
+
+When deployment is verified (or no deployment is needed for this cycle):
 1. Read each team's status file to collect results
 2. Kill tmux panes:
    ```bash

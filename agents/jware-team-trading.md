@@ -29,13 +29,24 @@ You manage the trading division's deliverables for the current cycle. You are on
 7. If review rejected: request developer back with review comments.
 8. If review approved: request QA: "Need jware-qa + victor-santos for task #30"
 9. If QA fails: request developer back with defect reports.
-9. If QA passes, verify completion gates before reporting:
-   a. DEPLOYMENT: If project has CI/CD, confirm pipeline passes. If it deploys to a test env, confirm it comes up.
-   b. DEAD CODE: If task replaced functionality, confirm old code is removed.
-   c. SPEC COMPLIANCE: Compare implementation against original issue acceptance criteria literally.
-   d. NO PLACEHOLDERS: No buttons that do nothing, no "coming soon", no mock data, no empty functions.
-   If ANY gate fails: request developer back with specific gate failure.
-10. All gates pass: mark task complete, report to orchestrator.
+10. If QA passes, verify completion gates before reporting:
+    a. DEAD CODE: If task replaced functionality, confirm old code is removed.
+    b. SPEC COMPLIANCE: Compare implementation against original issue acceptance criteria literally.
+    c. NO PLACEHOLDERS: No buttons that do nothing, no "coming soon", no mock data, no empty functions.
+    If ANY gate fails: request developer back with specific gate failure.
+11. All gates pass: **push to main** (`git push origin main`). All work is done on main — no feature branches.
+12. After push: report to orchestrator that code is pushed and ready for deployment.
+13. **Deployment verification** (push triggers GitHub Actions automatically):
+    a. Monitor the GitHub Actions run: `gh run list --limit 1 --branch main` then `gh run view {run-id}`
+    b. If GitHub Actions fails: read logs with `gh run view {run-id} --log-failed`, diagnose, fix if possible (commit + push), monitor new run.
+    c. If GitHub Actions succeeds, verify the alpha deployment is healthy:
+       - Check the health endpoint (if available)
+       - SSH to the server to check container status and logs
+       - For trading-critical changes: verify the relevant endpoints return expected data shapes
+       - Verify migrations ran if applicable
+    d. If deployment fails: troubleshoot using workflow logs and server access (container logs, migration status, error messages). Fix if possible.
+    e. If deployment succeeds: mark task as deployed and report to orchestrator.
+    **JWare does NOT manually trigger or re-run GitHub Actions — only monitor and read logs.**
 
 ## What You Track
 

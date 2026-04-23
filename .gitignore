@@ -22,3 +22,7 @@ node_modules/
 # Temp files
 /tmp/
 *.tmp
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
